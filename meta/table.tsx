@@ -7,41 +7,43 @@ export type ColumnsType = {
   sorter?: any;
 }[];
 
+type FilterListProps = {
+  stateFilterList?: FilterType;
+  cityFilterList?: FilterType;
+};
+
 type FilterType = {
   text: string;
   value: string;
 }[];
 
-export const columns: ColumnsType = [
-    {
-      title: "City",
-      dataIndex: "city",
-      onFilter: (value: string, record: any) => record.city.indexOf(value) === 0,
-    },
+export const getColumns = ({
+  stateFilterList,
+  cityFilterList
+}: FilterListProps): ColumnsType => {
+  return [
     {
       title: "State",
       dataIndex: "state",
-      onFilter: (value: string, record: any) => record.state.indexOf(value) === 0,
+      filters: stateFilterList,
+      onFilter: (value: any, record: any) => record.state.indexOf(value) === 0,
     },
     {
-      title: "Type",
-      dataIndex: "type",
-      filters: [
-        {
-          text: "Apartment",
-          value: "Apartment",
-        },
-        {
-          text: "Condo",
-          value: "Condo",
-        },
-      ],
-      onFilter: (value: string, record: any) => record.type.indexOf(value) === 0,
+      title: "City",
+      dataIndex: "city",
+      filters: cityFilterList,
+      onFilter: (value: any, record: any) => record.city.indexOf(value) === 0,
     },
     {
-      title: "Price",
-      dataIndex: "price",
+      title: "Houses",
+      dataIndex: "houses",
       defaultSortOrder: "descend",
+      sorter: (a: any, b: any) => a.houses - b.houses,
+    },
+    {
+      title: "Avg. Price",
+      dataIndex: "avgPrice",
       sorter: (a: any, b: any) => a.price - b.price,
     },
   ];
+};

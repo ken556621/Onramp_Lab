@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { Table } from "antd";
-import { columns } from "@/meta/table";
+import { getColumns } from "@/meta/table";
 import "antd/dist/antd.css";
 import axios from "axios";
-import { formatPropertiesList, PropertiesDataType } from "@/util/format";
+import { formatPropertiesList, PropertiesDataType, groupByStateAndCity } from "@/util/format";
 import Spinner from "@/components/Spinner";
 import styled from "styled-components";
 
@@ -18,7 +18,9 @@ const Home: NextPage = () => {
       setIsFetching(true);
       const { data } = await axios.get("/api/properties"); 
 
-      const formatedData: PropertiesDataType = formatPropertiesList(data.data);
+      const groupedData = groupByStateAndCity(data.data); 
+
+      const formatedData = formatPropertiesList(groupedData);
 
       setPropertiesList(formatedData);
       setIsFetching(false);
@@ -35,6 +37,20 @@ const Home: NextPage = () => {
   useEffect(() => {
     fetchProperties();
   }, []);
+
+  const stateFilterList = propertiesList.map(property => {
+    return {
+      text: property.state,
+      value: property.state
+    }
+  });
+
+  const cityFilterList = propertiesList.map(property => {
+    return {
+      text: property.city,
+      value: property.city
+    }
+  });
 
   if(isFetching){
     return (
@@ -55,7 +71,10 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Table 
-        columns={columns} 
+        columns={getColumns({
+          stateFilterList,
+          cityFilterList
+        })} 
         dataSource={propertiesList} 
         onChange={onChange} 
       />
