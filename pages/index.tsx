@@ -80,7 +80,7 @@ const Home: NextPage = () => {
       </Select>
       <Table 
         columns={getColumns({
-          filterList: propertiesList,
+          filterList: groupByData,
           groupByTarget: groupByOption
         })} 
         dataSource={groupByData} 
