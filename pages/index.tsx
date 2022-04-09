@@ -30,10 +30,6 @@ const Home: NextPage = () => {
     }
   };
 
-  const onChange = (pagination: any, filters: any, sorter: any, extra: any) => {
-    console.log("params", pagination, filters, sorter, extra);
-  }
-
   useEffect(() => {
     fetchProperties();
   }, []);
@@ -76,7 +72,6 @@ const Home: NextPage = () => {
           cityFilterList
         })} 
         dataSource={propertiesList} 
-        onChange={onChange} 
       />
     </Container>
   )
