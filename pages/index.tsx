@@ -1,26 +1,34 @@
 import { useState, useEffect } from "react";
 import type { NextPage } from "next";
-import Head from "next/head";
-import { Table } from "antd";
-import { getColumns } from "@/meta/table";
-import "antd/dist/antd.css";
 import axios from "axios";
-import { formatPropertiesList, PropertiesDataType, groupByStateAndCity } from "@/util/format";
-import Spinner from "@/components/Spinner";
+import Head from "next/head";
 import styled from "styled-components";
+import "antd/dist/antd.css";
+
+import { getColumns } from "@/meta/table";
+import { groupByFields } from "@/meta/select";
+import { 
+  formatPropertiesList,
+  PropertiesDataType, 
+  groupBy 
+} from "@/util/format";
+import Spinner from "@/components/Spinner";
+import { Select } from "antd";
+import { Table } from "antd";
 
 const Home: NextPage = () => {
   const [propertiesList, setPropertiesList] = useState<PropertiesDataType>([]);
+  const [groupByOption, setGroupByOption] = useState<string>("no");
   const [isFetching, setIsFetching] = useState<boolean>(false);
+
+  const { Option } = Select;
 
   const fetchProperties = async() => {
     try {
       setIsFetching(true);
       const { data } = await axios.get("/api/properties"); 
 
-      const groupedData = groupByStateAndCity(data.data); 
-
-      const formatedData = formatPropertiesList(groupedData);
+      const formatedData = formatPropertiesList(data.data);
 
       setPropertiesList(formatedData);
       setIsFetching(false);
@@ -30,23 +38,15 @@ const Home: NextPage = () => {
     }
   };
 
+  const renderSelectOptions = () => {
+    return groupByFields.map(field => (
+      <Option key={field.value} value={field.value}>{field.label}</Option>
+    ))
+  };
+
   useEffect(() => {
     fetchProperties();
   }, []);
-
-  const stateFilterList = propertiesList.map(property => {
-    return {
-      text: property.state,
-      value: property.state
-    }
-  });
-
-  const cityFilterList = propertiesList.map(property => {
-    return {
-      text: property.city,
-      value: property.city
-    }
-  });
 
   if(isFetching){
     return (
@@ -59,6 +59,8 @@ const Home: NextPage = () => {
     )
   }
 
+  const groupByData = groupBy(propertiesList, groupByOption);
+
   return (
     <Container>
       <Head>
@@ -66,12 +68,22 @@ const Home: NextPage = () => {
         <meta name="description" content="Frontend home work" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <Select 
+        defaultValue="no" 
+        style={{ 
+          width: 200,
+          margin: "20px"
+        }} 
+        onChange={(value) => setGroupByOption(value)}
+      >
+        {renderSelectOptions()}
+      </Select>
       <Table 
         columns={getColumns({
-          stateFilterList,
-          cityFilterList
+          filterList: propertiesList,
+          groupByTarget: groupByOption
         })} 
-        dataSource={propertiesList} 
+        dataSource={groupByData} 
       />
     </Container>
   )
