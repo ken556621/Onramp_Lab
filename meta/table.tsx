@@ -60,17 +60,51 @@ const getFliterPriceRange = (list: PropertiesDataType, dividerCount: number): Fi
   })
 };
 
+const getAvgPrice = (list: PropertiesDataType) => {
+  let totalPrice = 0;
+
+  list.forEach(item => {
+    totalPrice += item.price
+  });
+
+  return Math.round(totalPrice / list.length);
+};
+
+const compareToAvgPrice = (price: number, avgPrice: number) => {
+  if(price > avgPrice){
+    return (
+      <span style={{color: "red"}}>
+        {price}
+      </span>
+    )
+  }
+  if(price < avgPrice){
+    return (
+      <span style={{color: "green"}}>
+        {price}
+      </span>
+    )
+  }
+
+  return (
+    <span style={{color: "black"}}>
+      {price}
+    </span>
+  )
+};
+
 export const getColumns = ({
   filterList,
   groupByTarget
 }: FilterListProps): ColumnsType => {
+  const avgPrice = getAvgPrice(filterList);
   return [
     {
       title: "State",
       dataIndex: "state",
       filters: getFliterList(filterList, "state"),
       onFilter: (value: any, record: any) => record.state.indexOf(value) === 0,
-      isShow: true
+      isShow: true,
     },
     {
       title: "City",
@@ -113,7 +147,8 @@ export const getColumns = ({
       dataIndex: "price",
       filters: getFliterPriceRange(filterList, 5), // Default divided by 5 chunks
       onFilter: (value: any, record: any) => record.price <= value[1] && record.price >= value[0],
-      isShow: groupByTarget === "no"
+      isShow: groupByTarget === "no",
+      render: (text: any, record: any) => compareToAvgPrice(record.price, avgPrice)
     },
     {
       title: "Total Price",

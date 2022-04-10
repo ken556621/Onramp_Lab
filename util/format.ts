@@ -8,7 +8,7 @@ type GroupByObjType = {
     [key: string]: PropertiesDataType
 }
 
-type Obj = {
+type ObjType = {
     id: number,
     city: string,
     state: string,
@@ -71,7 +71,7 @@ export const formatGroupByPropertiesList = (groupByObj: GroupByObjType, target: 
 
     for (let prop in groupByObj) {
         const totalTypeArr: string[] = [];
-        const obj: Obj = {
+        const obj: ObjType = {
             id: 0,
             city: "",
             state: "",
